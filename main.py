@@ -85,8 +85,8 @@ if __name__ == '__main__':
     # Bump up the speeds for transfer
     sftp = paramiko.SFTPClient.from_transport(
         transport,
-        window_size= 16 * 1024 * 1024,
-        max_packet_size= 256 * 1024,
+        window_size=16 * 1024 * 1024,
+        max_packet_size=256 * 1024,
     )
     print('sftp open')
     ensure_remote_dir(remote_dir)
