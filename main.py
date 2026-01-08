@@ -1,7 +1,5 @@
 import configparser
 import os
-from doctest import BLANKLINE_MARKER
-
 import paramiko
 
 
