@@ -13,10 +13,13 @@ username = config['user']
 password = config['password']
 local_dir = config['local_dir']
 remote_dir = config['remote_dir']
+x_plex_token = config['xplextoken']
 
 blacklist = {
     '.parts'
 }
+
+made_changes = False
 
 def ensure_remote_dir(remote_path: str):
     """
@@ -66,12 +69,24 @@ def upload_dir(local, remote):
                 upload = True
 
             if upload:
+                global made_changes
+                made_changes = True
                 print(f'coppying... {local_path}')
                 ensure_remote_dir(remote_path)
                 sftp.put(local_path, remote_path, confirm=False)
                 print(f'uploaded {remote_path}')
             else:
                 print(f'skipping {remote_path}')
+
+
+def scan_libs():
+    import requests
+
+    url = f"http://{host}:32400"
+    token = x_plex_token
+    url = f"{url}/library/sections/all/refresh"
+    r = requests.get(url, params={"X-Plex-Token": token}, timeout=10)
+    r.raise_for_status()
 
 
 if __name__ == '__main__':
@@ -91,6 +106,11 @@ if __name__ == '__main__':
     print('sftp open')
     ensure_remote_dir(remote_dir)
     upload_dir(local_dir, remote_dir)
+
+    if made_changes:
+        print('Made changes. Scanning libraries...')
+        scan_libs()
+        print('Lib scan complete')
 
     sftp.close()
     ssh.close()
